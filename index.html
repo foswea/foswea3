@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #map {
+      width: 80%;
+      height: 500px;
+      float: left;
+    }
+
+    #timestamp {
+      width: 20%;
+      height: 100px;
+      float: right;
+    }
+
+    .button {
+      font-size: 20px;
+      padding: 10px;
+      margin: 10px;
+      width: 100%;
+    }
+
+    #scale {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+  </style>
+
+  <!-- Add Leaflet CSS and JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timestamp">
+    <img src="https://ddgmui.imd.gov.in/dwr_img/GIS/ValidTime.png" alt="Timestamp">
+  </div>
+
+  <button class="button" onclick="location.reload()">Refresh</button>
+
+  <div id="scale">
+    <img src="https://ddgmui.imd.gov.in/radar/scale_ppz.jpg" alt="PPZ Scale">
+  </div>
+
+  <script>
+    var map;
+    var radarLayerUrl = "https://ddgmui.imd.gov.in/radar/leaflet-map-csv-master/";
+    var radarLayer; // Variable to store the radar layer
+
+    function initMap() {
+      map = L.map('map').setView([20.5937, 78.9629], 5); // Set initial center and zoom level
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+      }).addTo(map);
+
+      // Load image overlays
+      var overlays = {
+        DLI_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/DLI-PPI.png', [[26.342972, 74.663177], [30.836529, 79.780724]], {opacity: 0.7, autoZIndex: true}),
+        GOA_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/GOA-PPI.png', [[13.235000, 71.483635], [17.731600, 76.149567]], {opacity: 0.7, autoZIndex: true}),
+        PTL_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/PTL-PPI.png', [[28.109161, 73.843796], [32.605839, 79.054985]], {opacity: 0.7, autoZIndex: true}),
+        SRN_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/SRN-PPI.png', [[31.802645, 72.091362], [36.299355, 77.518639]], {opacity: 0.7, autoZIndex: true}),
+        JPR_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/JPR-PPI.png', [[24.572233, 73.299263], [29.068886, 78.337959]], {opacity: 0.7, autoZIndex: true}),
+        BHP_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/BHP-PPI.png', [[20.994617, 74.978836], [25.488142, 79.869209]], {opacity: 0.7, autoZIndex: true}),
+        LKN_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/LKN-PPI.png', [[24.500938, 78.364400], [28.994482, 83.397327]], {opacity: 0.7, autoZIndex: true}),
+        PTN_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/PTN-CAP.png', [[23.333067, 82.595657], [27.829712, 87.581001]], {opacity: 0.7, autoZIndex: true}),
+        CAL_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/CAL-PPI.png', [[20.322186, 85.918198], [24.818815, 90.787804]], {opacity: 0.7, autoZIndex: true}),
+        PDP_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/PDP-PPI.png', [[17.995041, 84.290161], [22.490023, 89.086411]], {opacity: 0.7, autoZIndex: true}),
+        VSK_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/VSK-PPI.png', [[15.499828, 80.984932], [19.996437, 85.706253]], {opacity: 0.7, autoZIndex: true}),
+        KKL_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/KKL-PPI.png', [[8.667069, 77.553284], [13.160551, 82.129539]], {opacity: 0.7, autoZIndex: true}),
+        MPT_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/MPT-PPI.png', [[13.935452, 78.8134461], [18.428947, 83.492332]], {opacity: 0.7, autoZIndex: true}),
+        CNI_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/CNI-PPI.png', [[10.824535, 77.980217], [15.321131, 82.596451]], {opacity: 0.7, autoZIndex: true}),
+        HYD_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/HYD-PPI.png', [[15.198250, 76.118256], [19.691750, 80.828400]], {opacity: 0.7, autoZIndex: true}),
+        MUM_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/MUM-PPI.png', [[16.640245, 70.463211], [21.132158, 75.215790]], {opacity: 0.7, autoZIndex: true}),
+        NGP_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/NGP-PPI.png', [[18.823282, 76.694084], [23.318220, 81.516655]], {opacity: 0.7, autoZIndex: true}),
+        BHJ_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/BHJ-PPI.png', [[20.975243, 67.238480], [25.470028, 72.135628]], {opacity: 0.7, autoZIndex: true}),
+        AGT_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/AGT-PPI.png', [[21.639402, 88.791054], [26.136038, 93.708946]], {opacity: 0.7, autoZIndex: true}),
+        MBR_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/MBR-PPI.png', [[25.218342, 92.482712], [29.714998, 97.550629]], {opacity: 0.7, autoZIndex: true}),
+        KOC_PPI: L.imageOverlay('https://ddgmui.imd.gov.in/dwr_img/GIS/maxpic_KOCHI.png', [[7.76598049035,74.08958018106], [12.07261559098,78.46499553034]], {opacity: 0.7, autoZIndex: true})
+      };
+
+      // Add image overlays to the map
+      for (var overlay in overlays) {
+        overlays[overlay].addTo(map);
+      }
+
+      // Load the radar map layer
+      radarLayer = L.tileLayer(radarLayerUrl, {
+        tms: true,
+        opacity: 0.7, // Adjust the opacity if needed
+      }).addTo(map);
+    }
+
+    // Load the map when the page is ready
+    document.addEventListener("DOMContentLoaded", function () {
+      initMap();
+    });
+
+    function refreshMap() {
+      // Remove the existing radar layer and add a new one
+      if (map.hasLayer(radarLayer)) {
+        map.removeLayer(radarLayer);
+      }
+      radarLayer = L.tileLayer(radarLayerUrl, {
+        tms: true,
+        opacity: 0.7, // Adjust the opacity if needed
+      }).addTo(map);
+    }
+  </script>
+</body>
+</html>
