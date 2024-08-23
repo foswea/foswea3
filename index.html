@@ -45,6 +45,11 @@
     <label for="cloudCheckbox">Show Clouds</label>
   </div>
 
+  <div>
+    <input type="checkbox" id="radarAnimationCheckbox" onchange="toggleRadarAnimation()">
+    <label for="radarAnimationCheckbox">Radar Animation</label>
+  </div>
+
   <div id="scale">
     <img src="https://ddgmui.imd.gov.in/radar/scale_ppz.jpg" alt="PPZ Scale">
   </div>
@@ -53,6 +58,7 @@
     var map;
     var radarLayer;
     var cloudLayer;
+    var radarAnimationLayer;
 
     function initMap() {
       map = L.map('map').setView([20.5937, 78.9629], 5);
@@ -91,6 +97,26 @@
 
       // Initialize cloud layer (but don't add to map yet)
       cloudLayer = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/insatfinal.png', [[45.5, 44.50], [-10.00, 105.5]], {opacity: 0.7, autoZIndex: true});
+
+      // Initialize radar animation layers
+      var DLIgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/delhi.gif', [[26.342972, 74.663177], [30.836529, 79.780724]], { opacity: 0.7, autoZIndex: true }),
+          GOAgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/goa.gif', [[13.235000, 71.483635], [17.731600, 76.149567]], { opacity: 0.7, autoZIndex: true }),
+          PTLgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/patiala.gif', [[28.109161, 73.843796], [32.605839, 79.054985]], { opacity: 0.7, autoZIndex: true }),
+          SRNgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/srinagar.gif', [[31.802645, 72.091362], [36.299355, 77.518639]], { opacity: 0.7, autoZIndex: true }),
+          JPRgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/jaipur.gif', [[24.572233, 73.299263], [29.068886, 78.337959]], { opacity: 0.7, autoZIndex: true }),
+          BHPgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/bhopal.gif', [[20.994617, 74.978836], [25.488142, 79.869209]], { opacity: 0.7, autoZIndex: true }),
+          LKNgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/lucknow.gif', [[24.500938, 78.364400], [28.994482, 83.397327]], { opacity: 0.7, autoZIndex: true }),
+          PTNgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/patna.gif', [[23.333067, 82.595657], [27.829712, 87.581001]], { opacity: 0.7, autoZIndex: true }),
+          VSKgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/visakhapatnam.gif', [[15.486465, 81.013153], [19.981535, 85.737358]], { opacity: 0.7, autoZIndex: true }),
+          KKLgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/kariakal.gif', [[8.667069, 77.553284], [13.160551, 82.129539]], { opacity: 0.7, autoZIndex: true }),
+          MPTgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/machlipatnam.gif', [[13.935452, 78.8134461], [18.428947, 83.492332]], { opacity: 0.7, autoZIndex: true }),
+          CNIgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/chennai.gif', [[10.824535, 77.980217], [15.321131, 82.596451]], { opacity: 0.7, autoZIndex: true }),
+          HYDgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/hyderabad.gif', [[15.198250, 76.118256], [19.691750, 80.828400]], { opacity: 0.7, autoZIndex: true }),
+          NGPgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/nagpur.gif', [[18.823282, 76.694084], [23.318220, 81.516655]], { opacity: 0.7, autoZIndex: true }),
+          AGTgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/agartala.gif', [[21.639402, 88.791054], [26.136038, 93.708946]], { opacity: 0.7, autoZIndex: true }),
+          MBRgif = L.imageOverlay('https://dss.imd.gov.in/dwr_img/GIS/mohanbari.gif', [[25.218342, 92.482712], [29.714998, 97.550629]], { opacity: 0.7, autoZIndex: true });
+
+      radarAnimationLayer = L.layerGroup([DLIgif, GOAgif, PTLgif, SRNgif, JPRgif, BHPgif, LKNgif, PTNgif, VSKgif, KKLgif, MPTgif, CNIgif, HYDgif, NGPgif, AGTgif, MBRgif]);
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -119,6 +145,15 @@
         if (cloudLayer) {
           map.removeLayer(cloudLayer);
         }
+      }
+    }
+
+    function toggleRadarAnimation() {
+      var checkbox = document.getElementById('radarAnimationCheckbox');
+      if (checkbox.checked) {
+        map.addLayer(radarAnimationLayer);
+      } else {
+        map.removeLayer(radarAnimationLayer);
       }
     }
   </script>
